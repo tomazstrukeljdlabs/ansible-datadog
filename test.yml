@@ -1,0 +1,18 @@
+- hosts: all
+  sudo: true
+
+  ### dependencies start
+  ### dependencies stop
+
+  pre_tasks:
+    - name: Include test variables
+      include_vars: example-vars.yml
+
+      ### dependencies start
+      ### dependencies stop
+
+
+  roles:
+    - ../ansible-datadog
+
+

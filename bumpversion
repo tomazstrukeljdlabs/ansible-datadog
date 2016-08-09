@@ -1,0 +1,34 @@
+#!/bin/bash
+
+HELP="$0 <patch|minor|major> [other bumpversion arguments..]"
+if ! [[ "${1}" =~ ^patch|minor|major$ ]]; then
+    echo $HELP
+    exit 1
+fi
+
+# check if branch is consistent with repo
+git pull 
+if [ "$?" != "0" ]; then 
+  echo "ERROR !! git pull has errors - Your branch is not consistent with remote !! Exiting.. " 
+  exit 1
+fi
+# check if tag allready exists
+CURVERSION=$(bumpversion $CHANGETYPE --commit --dry-run --tag --verbose $@ 2>&1 | grep "New version will be" | awk '{print $5}' | tr -d "'")
+git tag |grep $CURVERSION
+if [ "$?" = "0" ]; then
+  echo "ERROR !! Tag $CURVERSION allready exists in repo - check tags/commits !! Exiting.. "
+  exit 1
+fi
+
+# check if there are uncommited changes
+bumpversion $CHANGETYPE --commit --dry-run --tag --verbose $@ 2>&1 | grep "bumpversion.WorkingDirectoryIsDirtyException"
+if [ "$?" = "0" ]; then
+  echo "ERROR !! Working directory is not clean - first commit changes !! Exiting.. "
+  exit 1
+fi
+
+CHANGETYPE=$1
+shift
+bumpversion $CHANGETYPE --commit --tag $@
+
+git push --mirror
