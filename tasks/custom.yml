@@ -1,0 +1,8 @@
+---
+- name: copy extra checks
+  copy: src=checks.d dest=/opt/datadog-agent/agent/ mode=644 owner={{ datadog_user }} group={{ datadog_group }}
+  notify: restart datadog-agent
+
+- name: delete all config
+  shell: rm -f /etc/dd-agent/conf.d/*.yaml
+

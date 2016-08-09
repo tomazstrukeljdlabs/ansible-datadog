@@ -1,4 +1,7 @@
 ---
+# additional stuff
+- include: custom.yml
+
 - include: pkg-debian.yml
   when: ansible_os_family == "Debian"
 
